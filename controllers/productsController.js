@@ -73,7 +73,7 @@ const removeProduct = asyncHandler(async (req, res) => {
 // Fetch All Products with Pagination
 // =============================
 const fetchProducts = asyncHandler(async (req, res) => {
-  const pageSize = 6;
+  const pageSize = 9;
   const page = Number(req.query.pageNumber) || 1;
 
   // 3. Check if a search keyword is provided, and if so, construct a regex query for searching products by name.
