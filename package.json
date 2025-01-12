@@ -6,6 +6,9 @@
     "dev": "nodemon server",
     "start": "node server"
   },
+  "static": {
+    "uploads": "uploads"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

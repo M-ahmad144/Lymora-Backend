@@ -39,7 +39,14 @@ app.use(express.urlencoded({ extended: true }));
 
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
-app.use("/uploads", express.static(path.join(__dirname, "./uploads")));
+
+if (process.env.NODE_ENV === "production") {
+  // For deployment environments
+  app.use("/uploads", express.static(path.resolve(__dirname, "../uploads")));
+} else {
+  // For local development
+  app.use("/uploads", express.static(path.join(__dirname, "./uploads")));
+}
 
 // Import and use routes
 app.use("/api/users", userRoutes);
