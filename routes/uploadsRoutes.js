@@ -1,61 +1,44 @@
 const express = require("express");
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const { v2: cloudinary } = require("cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const router = express.Router();
 
-// Ensure the uploads folder exists
-const uploadsDir = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir);
-}
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-// Storage configuration
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    const extname = path.extname(file.originalname);
-    cb(null, `${file.fieldname}-${Date.now()}${extname}`);
+// Configure Multer with Cloudinary Storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "LymoraImages", // Folder name in Cloudinary
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
   },
 });
 
-// File filter for images
-const fileFilter = (req, file, cb) => {
-  const allowedExtensions = /jpe?g|png|webp/;
-  const allowedMimeTypes = /image\/jpe?g|image\/png|image\/webp/;
-
-  const extname = path.extname(file.originalname).toLowerCase();
-  const mimetype = file.mimetype;
-
-  if (allowedExtensions.test(extname) && allowedMimeTypes.test(mimetype)) {
-    cb(null, true); // Accept file
-  } else {
-    cb(new Error("Only images (JPEG, PNG, WEBP) are allowed"), false); // Reject file
-  }
-};
-
-// Multer upload instance
-const upload = multer({ storage, fileFilter });
-const uploadSingleImage = upload.single("image");
+const upload = multer({ storage });
 
 // POST route for image upload
-router.post("/", (req, res) => {
-  uploadSingleImage(req, res, (err) => {
-    if (err) {
-      res.status(400).send({ message: err.message });
-    } else if (req.file) {
-      const relativePath = `/uploads/${req.file.filename}`;
-      res.status(200).send({
-        message: "Image uploaded successfully",
-        image: relativePath, // Return the relative path
-      });
-    } else {
-      res.status(400).send({ message: "No image file provided" });
+router.post("/", upload.single("image"), async (req, res) => {
+  try {
+    // Cloudinary returns the uploaded image details in `req.file`
+    if (!req.file || !req.file.path) {
+      return res.status(400).send({ message: "No image file provided" });
     }
-  });
+
+    res.status(200).send({
+      message: "Image uploaded successfully",
+      imageUrl: req.file.path, // Cloudinary URL
+    });
+  } catch (error) {
+    console.error("Error uploading image to Cloudinary:", error);
+    res.status(500).send({ message: "Image upload failed", error });
+  }
 });
 
 module.exports = router;
