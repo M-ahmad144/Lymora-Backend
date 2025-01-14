@@ -60,16 +60,26 @@ const addProduct = asyncHandler(async (req, res) => {
 // Update Product Details
 // =============================
 const updateProductDetails = asyncHandler(async (req, res) => {
+  console.log(req.fields);
   const validationError = validateProductFields(req.fields);
   if (validationError) {
     return res.status(400).json({ error: validationError });
   }
 
-  const product = await Product.findByIdAndUpdate(
-    req.params.id,
-    { ...req.fields },
-    { new: true }
-  );
+  const productData = {
+    name: req.fields.name,
+    description: req.fields.description,
+    price: req.fields.price,
+    category: req.fields.category,
+    quantity: req.fields.quantity,
+    brand: req.fields.brand,
+    countInStock: req.fields.countInStock,
+    image: req.fields.imageUrl,
+  };
+
+  const product = await Product.findByIdAndUpdate(req.params.id, productData, {
+    new: true,
+  });
 
   if (!product) {
     return res.status(404).json({ error: "Product not found" });
@@ -134,7 +144,7 @@ const fetchProductById = asyncHandler(async (req, res) => {
 const fetchAllProducts = asyncHandler(async (req, res) => {
   const products = await Product.find({})
     .populate("category")
-    .limit(12)
+    .populate("reviews")
     .sort({ createdAt: -1 });
 
   res.json(products);
