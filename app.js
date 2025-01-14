@@ -40,8 +40,6 @@ app.use(express.urlencoded({ extended: true }));
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/uploads", express.static(path.join(__dirname, "./uploads")));
-
 // Import and use routes
 app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
