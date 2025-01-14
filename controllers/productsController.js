@@ -108,13 +108,27 @@ const fetchProducts = asyncHandler(async (req, res) => {
   const pageSize = 9;
   const page = Number(req.query.pageNumber) || 1;
 
-  // 3. Check if a search keyword is provided, and if so, construct a regex query for searching products by name.
+  // Check if a search keyword is provided, and if so, construct a regex query for searching products by name.
   const keyword = req.query.keyword
     ? { name: { $regex: req.query.keyword, $options: "i" } } // Case-insensitive search for product name
-    : {}; // If no keyword, no filter is applied
+    : {};
 
+  // Define default criteria for "special" products (e.g., top rated or most reviewed).
+  let sortCriteria = {};
+  if (!req.query.keyword) {
+    // Set default sorting criteria if no keyword is provided (special products)
+    sortCriteria = {
+      rating: -1,
+      numReviews: -1,
+    };
+  }
+
+  // Get the count of the total documents matching the query (including the default sorting).
   const count = await Product.countDocuments({ ...keyword });
+
+  // Fetch the products with the default sorting or applied keyword filter.
   const products = await Product.find({ ...keyword })
+    .sort(sortCriteria) // Apply sorting for "special" products
     .limit(pageSize)
     .skip(pageSize * (page - 1));
 
