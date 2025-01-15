@@ -37,11 +37,11 @@ const createOrder = asyncHandler(async (req, res) => {
     res.status(400).json({ error: "No order items" });
     return;
   }
-
+  //get valid order items ids from the DB
   const itemsFromDB = await Product.find({
     _id: { $in: orderItems.map((x) => x._id) },
   });
-
+  //vaidate the items from the client side with the items from the DB
   const dbOrderItems = orderItems.map((itemFromClient) => {
     const matchingItemFromDB = itemsFromDB.find(
       (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id
