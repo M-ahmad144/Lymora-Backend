@@ -14,7 +14,7 @@ const validateProductFields = (fields) => {
   if (!category) return "Category is required";
   if (!quantity) return "Quantity is required";
 
-  return null; // No validation errors
+  return null;
 };
 
 // =============================
@@ -108,7 +108,6 @@ const fetchProducts = asyncHandler(async (req, res) => {
   const pageSize = 9;
   const page = Number(req.query.pageNumber) || 1;
 
-  // Check if a search keyword is provided, and if so, construct a regex query for searching products by name.
   const keyword = req.query.keyword
     ? { name: { $regex: req.query.keyword, $options: "i" } } // Case-insensitive search for product name
     : {};
@@ -116,19 +115,17 @@ const fetchProducts = asyncHandler(async (req, res) => {
   // Define default criteria for "special" products (e.g., top rated or most reviewed).
   let sortCriteria = {};
   if (!req.query.keyword) {
-    // Set default sorting criteria if no keyword is provided (special products)
     sortCriteria = {
       rating: -1,
       numReviews: -1,
     };
   }
 
-  // Get the count of the total documents matching the query (including the default sorting).
   const count = await Product.countDocuments({ ...keyword });
 
   // Fetch the products with the default sorting or applied keyword filter.
   const products = await Product.find({ ...keyword })
-    .sort(sortCriteria) // Apply sorting for "special" products
+    .sort(sortCriteria)
     .limit(pageSize)
     .skip(pageSize * (page - 1));
 
