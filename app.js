@@ -17,6 +17,7 @@ const userRoutes = require("./routes/userRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const productsRoutes = require("./routes/productsRoutes");
 const uploadsRoutes = require("./routes/uploadsRoutes");
+const orderRoutes = require("./routes/OrderRoutes");
 
 // Middleware setup
 app.use(cors());
@@ -45,7 +46,12 @@ app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productsRoutes);
 app.use("/api/uploads", uploadsRoutes);
-
+app.use("/api/orders", orderRoutes);
+app.use("api/config/paypal", (req, res) => {
+  res.send({
+    clientId: process.env.PAYPAL_CLIENT_ID,
+  });
+});
 // Error middleware
 app.use(errorMiddleware);
 

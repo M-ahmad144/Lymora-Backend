@@ -46,11 +46,9 @@ const createOrder = asyncHandler(async (req, res) => {
     const matchingItemFromDB = itemsFromDB.find(
       (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id
     );
-
     if (!matchingItemFromDB) {
       throw new Error(`Product not found: ${itemFromClient._id}`);
     }
-
     return {
       ...itemFromClient,
       product: itemFromClient._id,
