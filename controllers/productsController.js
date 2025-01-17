@@ -220,8 +220,8 @@ const filterProducts = asyncHandler(async (req, res) => {
   const { checked, radio } = req.body;
 
   let filters = {};
-  if (checked.length > 0) filters.category = checked; // categories will be filtered by checkbox
-  if (radio.length) filters.price = { $gte: radio[0], $lte: radio[1] }; // price will be filtered by radio
+  if (checked.length > 0) filters.category = checked;
+  if (radio.length) filters.price = { $gte: radio[0], $lte: radio[1] };
   //e.g
   const products = await Product.find(filters);
   res.json(products);
