@@ -13,15 +13,23 @@ require("dotenv").config();
 const app = express();
 const errorMiddleware = require("./middlewares/error");
 
+// Rate limiting setup - Add a custom limit to protect your API
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later.",
+});
+
 // Middleware setup
 app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(helmet());
-app.use(rateLimit({}));
+app.use(limiter);
 app.use(mongoSanitize());
 app.use(xss());
 app.use(hpp());
+
 // Trust the proxy headers
 app.set("trust proxy", 1);
 
@@ -56,7 +64,7 @@ app.get("/api/config/paypal", (req, res) => {
   res.json({ clientId: paypalClientId });
 });
 
-// Error middleware
+// Error handling middleware should be last
 app.use(errorMiddleware);
 
 module.exports = app;
