@@ -18,15 +18,12 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(helmet());
-app.use(
-  rateLimit({
-    windowMs: 5 * 60 * 1000, // 5 minutes
-    max: 100, // Limit each IP to 100 requests per windowMs
-  })
-);
+app.use(rateLimit({}));
 app.use(mongoSanitize());
 app.use(xss());
 app.use(hpp());
+// Trust the proxy headers
+app.set("trust proxy", 1);
 
 // Body parser middleware
 app.use(express.json());
