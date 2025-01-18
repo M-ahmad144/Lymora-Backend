@@ -5,7 +5,7 @@ const ErrorHandler = require("../utils/errorHandler");
 
 exports.authMiddleware = asyncHandler(async (req, res, next) => {
   const token = req.cookies.jwt;
-
+  console.log(token);
   if (!token) {
     return next(new ErrorHandler("No token, authorization denied", 401));
   }
@@ -20,7 +20,6 @@ exports.authMiddleware = asyncHandler(async (req, res, next) => {
       );
     }
 
-    // Attach user to request object
     req.user = user;
     next();
   } catch (error) {
