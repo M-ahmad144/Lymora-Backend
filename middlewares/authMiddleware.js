@@ -4,8 +4,8 @@ const User = require("../models/userModel");
 const ErrorHandler = require("../utils/errorHandler");
 
 exports.authMiddleware = asyncHandler(async (req, res, next) => {
-  const token = req.cookies.jwt;
-  console.log(token);
+  const token =
+    req.headers.authorization && req.headers.authorization.split(" ")[1]; // Get token after 'Bearer'
 
   if (!token) {
     return next(new ErrorHandler("No token, authorization denied", 401));
@@ -21,8 +21,7 @@ exports.authMiddleware = asyncHandler(async (req, res, next) => {
       );
     }
 
-    // Attach user to request object
-    req.user = user;
+    req.user = user; // Attach user to the request object
     next();
   } catch (error) {
     return next(new ErrorHandler("Invalid or expired token", 401));

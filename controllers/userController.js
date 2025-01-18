@@ -6,18 +6,24 @@ const ErrorHandler = require("../utils/errorHandler");
 // sign-up
 exports.signupUser = asyncHandler(async (req, res, next) => {
   const { username, email, password } = req.body;
+
   if (!username || !email || !password) {
     return next(new ErrorHandler("Please fill all the inputs.", 400));
   }
+
   const existUser = await User.findOne({ email });
   if (existUser) {
     return next(new ErrorHandler("User already exists", 400));
   }
+
   const newUser = await User.create({ username, email, password });
-  // Generate token and set it as a cookie
-  generateToken(res, newUser._id);
+
+  // Generate token and send it in the response body (not in cookies)
+  const token = generateToken(newUser._id);
+
   res.status(201).json({
     success: true,
+    token, // Send the token in the response
     data: {
       id: newUser._id,
       username: newUser.username,
@@ -31,16 +37,22 @@ exports.signupUser = asyncHandler(async (req, res, next) => {
 exports.loginUser = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email }).select("+password");
+
   if (!user) {
     return next(new ErrorHandler("Invalid credentials", 401));
   }
+
   const isMatch = await user.comparePassword(password);
   if (!isMatch) {
     return next(new ErrorHandler("Invalid credentials", 401));
   }
-  generateToken(res, user._id);
+
+  // Generate token and send it in the response body
+  const token = generateToken(user._id);
+
   res.status(200).json({
     success: true,
+    token, // Send the token in the response
     data: {
       id: user._id,
       username: user.username,
@@ -50,12 +62,8 @@ exports.loginUser = asyncHandler(async (req, res, next) => {
   });
 });
 
-// logout-user
+// logout-user (No need for cookies, just clear the localStorage on client side)
 exports.logoutCurrentUser = (req, res) => {
-  res.cookie("jwt", "", {
-    httpOnly: true,
-    expires: new Date(0),
-  });
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
