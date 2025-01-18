@@ -32,8 +32,6 @@ const addProduct = asyncHandler(async (req, res) => {
     imageUrl,
   } = req.fields;
 
-  console.log(req.fields);
-
   const validationError = validateProductFields(req.fields);
   if (validationError) {
     return res.status(400).json({ error: validationError });

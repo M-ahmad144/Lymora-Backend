@@ -2,7 +2,6 @@ const asyncHandler = require("../middlewares/asyncHandler");
 const Category = require("../models/categoryModel");
 
 const createCategory = asyncHandler(async (req, res) => {
-  console.log(req.body);
   const { name } = req.body;
   if (!name) {
     return res.status(400).json({ message: "Name is required" });
