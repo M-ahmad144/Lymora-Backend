@@ -10,6 +10,13 @@ const hpp = require("hpp");
 const path = require("path");
 require("dotenv").config();
 
+// Routes
+const userRoutes = require("./routes/userRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
+const productsRoutes = require("./routes/productsRoutes");
+const uploadsRoutes = require("./routes/uploadsRoutes");
+const orderRoutes = require("./routes/OrderRoutes");
+
 const app = express();
 const errorMiddleware = require("./middlewares/error");
 
@@ -39,13 +46,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
-
-// Routes
-const userRoutes = require("./routes/userRoutes");
-const categoryRoutes = require("./routes/categoryRoutes");
-const productsRoutes = require("./routes/productsRoutes");
-const uploadsRoutes = require("./routes/uploadsRoutes");
-const orderRoutes = require("./routes/OrderRoutes");
 
 app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
