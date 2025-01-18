@@ -7,7 +7,7 @@ const generateToken = (res, userId) => {
   });
 
   // Set the JWT token in an HTTP-only cookie
-  res.cookie("jwt", token, {});
+  res.cookie("jwt", token);
 
   return token;
 };
