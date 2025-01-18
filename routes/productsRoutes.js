@@ -15,16 +15,13 @@ const {
   fetchNewProducts,
   filterProducts,
 } = require("../controllers/productsController");
-const { authMiddleware, authAdmin } = require("../middlewares/authMiddleware");
+
 const checkId = require("../middlewares/checkId");
 
-router
-  .route("/")
-  .get(fetchProducts)
-  .post(authMiddleware, authAdmin, formidable(), addProduct);
+router.route("/").get(fetchProducts).post(formidable(), addProduct);
 
 router.route("/allproducts").get(fetchAllProducts);
-router.route("/:id/reviews").post(authMiddleware, checkId, addProductReview);
+router.route("/:id/reviews").post(checkId, addProductReview);
 
 router.get("/top", fetchTopProducts);
 router.get("/new", fetchNewProducts);
@@ -32,8 +29,8 @@ router.get("/new", fetchNewProducts);
 router
   .route("/:id")
   .get(fetchProductById)
-  .put(authMiddleware, authAdmin, formidable(), updateProductDetails)
-  .delete(authMiddleware, authAdmin, removeProduct);
+  .put(formidable(), updateProductDetails)
+  .delete(removeProduct);
 
 router.route("/filtered-products").post(filterProducts);
 
